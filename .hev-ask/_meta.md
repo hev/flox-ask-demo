@@ -1,0 +1,828 @@
+---
+version: 2
+generatedAt: "2026-06-24T20:11:47.120Z"
+contentHash: "9665493abec5eeb5eabae03e0948da986cb9ec9b5f429ca5f502cee3baae9394"
+suggestions: ["How do I create a Flox environment and install packages into it?","How do I share an environment with my team using FloxHub?","How do I pin or install a specific version of a package?","How do I use Flox in a CI/CD pipeline like GitHub Actions?","What's the difference between Flox and containers like Docker?"]
+---
+
+## Context
+
+Flox is a developer environment and package manager built on Nix. It lets you create reproducible, declarative environments — defined by a `manifest.toml` and a lockfile inside a `.flox/` directory — that work across machines, architectures (x86_64 and ARM), and operating systems (macOS and Linux), and span from local development to CI to production. These docs cover four areas: **Getting started** (installing the CLI, the 'Flox in 5 minutes' quick start); **Concepts** — how environments, activation (subshell, in-place, exec; dev vs runtime mode), the Base Catalog and packages, package groups, generations, builds (manifest builds and Nix-expression builds), publishing, FloxHub, organizations, composition, secrets, and services work, plus comparisons like Flox vs containers; **Tutorials** — task-oriented how-tos for creating, sharing, layering, customizing, and composing environments, building/publishing packages, the default environment, multi-arch and cross-platform environments, CI/CD, systemd, CUDA, and migrating from Homebrew or nvm; and the **CLI Manual** — man pages for every `flox` subcommand (init, activate, install, search, show, edit, build, publish, push/pull, containerize, services, generations, config, auth, gc, …) plus the `manifest.toml` and `nix-builds.toml` format references and per-language guides (C, Go, JVM, Node.js, Python, Ruby, Rust). There is also an Imageless Kubernetes feature that runs FloxHub environments as Kubernetes pods via a containerd shim. Readers typically ask how-to questions ('how do I activate an environment', 'install a package', 'pin a specific version', 'share an environment with my team', 'use Flox in CI', 'build a container from my environment') and comparisons ('Flox vs Docker', 'Flox vs Nix flakes').
+## Overview
+
+## Concepts
+- Activating environments — `concepts/activation`
+- Activation flow — `concepts/activation#activation-flow`
+- Attaching — `concepts/activation#attaching`
+- Conclusion — `concepts/activation#conclusion`
+- Configuring the shell — `concepts/activation#configuring-the-shell`
+- Development vs. runtime mode — `concepts/activation#development-vs-runtime-mode`
+- Exec Command — `concepts/activation#exec-command`
+- Four different ways to activate — `concepts/activation#four-different-ways-to-activate`
+- hook vs. profile in a nutshell — `concepts/activation#hook-vs-profile-in-a-nutshell`
+- In-place — `concepts/activation#in-place`
+- Shell Command — `concepts/activation#shell-command`
+- Subshell — `concepts/activation#subshell`
+- Timeline — `concepts/activation#timeline`
+- What's inherited by a subshell — `concepts/activation#whats-inherited-by-a-subshell`
+- Base Catalog — `concepts/base-catalog`
+- Delays — `concepts/base-catalog#delays`
+- Flox branches — `concepts/base-catalog#flox-branches`
+- Retention — `concepts/base-catalog#retention`
+- Update schedule — `concepts/base-catalog#update-schedule`
+- Which packages does Flox evaluate — `concepts/base-catalog#which-packages-does-flox-evaluate`
+- Builds — `concepts/builds`
+- Cross-platform builds — `concepts/builds#cross-platform-builds`
+- Defining builds — `concepts/builds#defining-builds`
+- Performing builds — `concepts/builds#performing-builds`
+- Compatibility policy — `concepts/compatibility`
+- Composing environments — `concepts/composition`
+- Building blocks — `concepts/composition#building-blocks`
+- Getting the latest manifests — `concepts/composition#getting-the-latest-manifests`
+- Including an environment — `concepts/composition#including-an-environment`
+- Merging process — `concepts/composition#merging-process`
+- Environments — `concepts/environments`
+- Environment files — `concepts/environments#environment-files`
+- Environment uses — `concepts/environments#environment-uses`
+- env.json — `concepts/environments#envjson`
+- manifest.lock — `concepts/environments#manifestlock`
+- manifest.toml — `concepts/environments#manifesttoml`
+- pkgs — `concepts/environments#pkgs`
+- Flox vs. container workflows — `concepts/flox-vs-containers`
+- Add packages — `concepts/flox-vs-containers#add-packages`
+- Configuration — `concepts/flox-vs-containers#configuration`
+- Create a new development environment — `concepts/flox-vs-containers#create-a-new-development-environment`
+- Development-time services — `concepts/flox-vs-containers#development-time-services`
+- Perform initialization — `concepts/flox-vs-containers#perform-initialization`
+- Run tests in CI — `concepts/flox-vs-containers#run-tests-in-ci`
+- Send artifacts to production — `concepts/flox-vs-containers#send-artifacts-to-production`
+- Share the environment with your team — `concepts/flox-vs-containers#share-the-environment-with-your-team`
+- Tear down the development environment — `concepts/flox-vs-containers#tear-down-the-development-environment`
+- Use the development environment — `concepts/flox-vs-containers#use-the-development-environment`
+- FloxHub — `concepts/floxhub`
+- Account creation in FloxHub — `concepts/floxhub#account-creation-in-floxhub`
+- Authenticating with the CLI — `concepts/floxhub#authenticating-with-the-cli`
+- Automated upgrades — `concepts/floxhub#automated-upgrades`
+- Environment Detail page — `concepts/floxhub#environment-detail-page`
+- Environment page — `concepts/floxhub#environment-page`
+- Logging out in the CLI — `concepts/floxhub#logging-out-in-the-cli`
+- Logging out in the web application — `concepts/floxhub#logging-out-in-the-web-application`
+- Logging out of FloxHub — `concepts/floxhub#logging-out-of-floxhub`
+- Network connectivity — `concepts/floxhub#network-connectivity`
+- Referring to FloxHub environments — `concepts/floxhub#referring-to-floxhub-environments`
+- Working with Environments in FloxHub — `concepts/floxhub#working-with-environments-in-floxhub`
+- FloxHub environments — `concepts/floxhub-environments`
+- Activating a FloxHub environment — `concepts/floxhub-environments#activating-a-floxhub-environment`
+- Background — `concepts/floxhub-environments#background`
+- Generations — `concepts/floxhub-environments#generations`
+- Getting a FloxHub environment — `concepts/floxhub-environments#getting-a-floxhub-environment`
+- Getting information from upstream — `concepts/floxhub-environments#getting-information-from-upstream`
+- Operations on FloxHub environments — `concepts/floxhub-environments#operations-on-floxhub-environments`
+- Packages — `concepts/floxhub-environments#packages`
+- Terminology — `concepts/floxhub-environments#terminology`
+- Generations — `concepts/generations`
+- First generation — `concepts/generations#first-generation`
+- Generation lock — `concepts/generations#generation-lock`
+- History — `concepts/generations#history`
+- New generations — `concepts/generations#new-generations`
+- Staged local generations — `concepts/generations#staged-local-generations`
+- Switching and viewing generations — `concepts/generations#switching-and-viewing-generations`
+- Manifest builds — `concepts/manifest-builds`
+- Build outputs — `concepts/manifest-builds#build-outputs`
+- Defining builds — `concepts/manifest-builds#defining-builds`
+- Example: configuration files — `concepts/manifest-builds#example-configuration-files`
+- Example: protocol buffers — `concepts/manifest-builds#example-protocol-buffers`
+- Examples — `concepts/manifest-builds#examples`
+- Limiting the package size — `concepts/manifest-builds#limiting-the-package-size`
+- Overview — `concepts/manifest-builds#overview`
+- Pure builds — `concepts/manifest-builds#pure-builds`
+- Vendoring dependencies — `concepts/manifest-builds#vendoring-dependencies`
+- What can you build — `concepts/manifest-builds#what-can-you-build`
+- Nix expression builds — `concepts/nix-expression-builds`
+- Defining builds — `concepts/nix-expression-builds#defining-builds`
+- Example: Building a third-party project — `concepts/nix-expression-builds#example-building-a-third-party-project`
+- Example: Building your own project — `concepts/nix-expression-builds#example-building-your-own-project`
+- Example: Distributing a script — `concepts/nix-expression-builds#example-distributing-a-script`
+- Example: Extensions of an existing package — `concepts/nix-expression-builds#example-extensions-of-an-existing-package`
+- Example: Newer version of an existing package — `concepts/nix-expression-builds#example-newer-version-of-an-existing-package`
+- Example: Patches to an existing package — `concepts/nix-expression-builds#example-patches-to-an-existing-package`
+- Example: Vendor an existing package — `concepts/nix-expression-builds#example-vendor-an-existing-package`
+- Generating hashes — `concepts/nix-expression-builds#generating-hashes`
+- Overview — `concepts/nix-expression-builds#overview`
+- Tips — `concepts/nix-expression-builds#tips`
+- What can you build — `concepts/nix-expression-builds#what-can-you-build`
+- Organizations — `concepts/organizations`
+- Environment Visibility and Management — `concepts/organizations#environment-visibility-and-management`
+- Machine Access Tokens — `concepts/organizations#machine-access-tokens`
+- Permissions and Access Control — `concepts/organizations#permissions-and-access-control`
+- User Membership — `concepts/organizations#user-membership`
+- Package Groups — `concepts/package-groups`
+- 1. Splitting Dev Tools from Runtime — `concepts/package-groups#1-splitting-dev-tools-from-runtime`
+- 1. The Nix Store: Hash-Based Isolation — `concepts/package-groups#1-the-nix-store-hash-based-isolation`
+- 2. ML Framework Isolation — `concepts/package-groups#2-ml-framework-isolation`
+- 2. RUNPATH: No Global Library Search — `concepts/package-groups#2-runpath-no-global-library-search`
+- 3. Resolving File Conflicts with Priority and Groups — `concepts/package-groups#3-resolving-file-conflicts-with-priority-and-groups`
+- 3. The Flox Environment: A Merged Symlink Forest — `concepts/package-groups#3-the-flox-environment-a-merged-symlink-forest`
+- A Canonical Example — `concepts/package-groups#a-canonical-example`
+- Appendix A: Concept Mapping Between Flox and Nix — `concepts/package-groups#appendix-a-concept-mapping-between-flox-and-nix`
+- Appendix B: How Otherwise Incompatible Packages Coexist in a Single Flox Environment — `concepts/package-groups#appendix-b-how-otherwise-incompatible-packages-coexist-in-a-single-flox-environment`
+- Atomic Group Advancement — `concepts/package-groups#atomic-group-advancement`
+- Broken Packages Causing Silent Resolution Failures — `concepts/package-groups#broken-packages-causing-silent-resolution-failures`
+- Comparison Table — `concepts/package-groups#comparison-table`
+- Constraints too tight — `concepts/package-groups#constraints-too-tight`
+- Cross-Platform Split — `concepts/package-groups#cross-platform-split`
+- Default Group: toplevel — `concepts/package-groups#default-group-toplevel`
+- How Package Groups Work — `concepts/package-groups#how-package-groups-work`
+- Isolating Packages with Tight Version Constraints — `concepts/package-groups#isolating-packages-with-tight-version-constraints`
+- Lock File Anatomy — `concepts/package-groups#lock-file-anatomy`
+- Mental Model: The Same Package Group = The Same nixpkgs Commit — `concepts/package-groups#mental-model-the-same-package-group--the-same-nixpkgs-commit`
+- Non-toplevel Packages Missing During Builds — `concepts/package-groups#non-toplevel-packages-missing-during-builds`
+- Only toplevel Packages Are Available During Flox Manifest Builds — `concepts/package-groups#only-toplevel-packages-are-available-during-flox-manifest-builds`
+- Package Groups and Builds — `concepts/package-groups#package-groups-and-builds`
+- Practical Examples — `concepts/package-groups#practical-examples`
+- Resolution — `concepts/package-groups#resolution`
+- Resolving "Constraints Too Tight" Failures — `concepts/package-groups#resolving-constraints-too-tight-failures`
+- Separating Optional Tooling from Core Dependencies — `concepts/package-groups#separating-optional-tooling-from-core-dependencies`
+- Side-by-Side: Flox Manifest vs. Nix Flake — `concepts/package-groups#side-by-side-flox-manifest-vs-nix-flake`
+- Trimming Runtime Closures — `concepts/package-groups#trimming-runtime-closures`
+- Troubleshooting — `concepts/package-groups#troubleshooting`
+- Upgrade Semantics — `concepts/package-groups#upgrade-semantics`
+- What Are Package Groups — `concepts/package-groups#what-are-package-groups`
+- What Triggers a Change — `concepts/package-groups#what-triggers-a-change`
+- What's Different — `concepts/package-groups#whats-different`
+- When to Use Package Groups — `concepts/package-groups#when-to-use-package-groups`
+- Why Package Groups Matter — `concepts/package-groups#why-package-groups-matter`
+- Catalog and Packages — `concepts/packages-and-catalog`
+- Base Catalog and nixpkgs — `concepts/packages-and-catalog#base-catalog-and-nixpkgs`
+- Supported package metadata — `concepts/packages-and-catalog#supported-package-metadata`
+- Publishing — `concepts/publishing`
+- Consuming published packages — `concepts/publishing#consuming-published-packages`
+- Publish process — `concepts/publishing#publish-process`
+- Sharing — `concepts/publishing#sharing`
+- The published payload — `concepts/publishing#the-published-payload`
+- Uploading a package — `concepts/publishing#uploading-a-package`
+- Secrets management — `concepts/secrets-management`
+- 1. Primary auth once per session — `concepts/secrets-management#1-primary-auth-once-per-session`
+- 2. Secret retrieval on-activate — `concepts/secrets-management#2-secret-retrieval-on-activate`
+- 3. Scoped env var injection — `concepts/secrets-management#3-scoped-env-var-injection`
+- Further reading — `concepts/secrets-management#further-reading`
+- Implementation examples — `concepts/secrets-management#implementation-examples`
+- Key security properties — `concepts/secrets-management#key-security-properties`
+- Rotating a secret — `concepts/secrets-management#rotating-a-secret`
+- Secret store reference — `concepts/secrets-management#secret-store-reference`
+- The JIT secrets pattern — `concepts/secrets-management#the-jit-secrets-pattern`
+- Services — `concepts/services`
+- Checking on services — `concepts/services#checking-on-services`
+- Defining services — `concepts/services#defining-services`
+- Handling environment edits — `concepts/services#handling-environment-edits`
+- Restarting services — `concepts/services#restarting-services`
+- Starting services — `concepts/services#starting-services`
+- Stopping services — `concepts/services#stopping-services`
+## Customer
+- Catalog Store — `customer/catalog-store`
+- Configure an AWS S3 bucket — `customer/catalog-store#configure-an-aws-s3-bucket`
+- Create and set a signing key — `customer/catalog-store#create-and-set-a-signing-key`
+- Ensure the Nix Daemon has access to the S3 Bucket — `customer/catalog-store#ensure-the-nix-daemon-has-access-to-the-s3-bucket`
+- Policy example — `customer/catalog-store#policy-example`
+- Set Catalog Store ingress and egress URIs — `customer/catalog-store#set-catalog-store-ingress-and-egress-uris`
+- Known issues — `customer/known-issues`
+- Build — `customer/known-issues#build`
+- False positive dependencies — `customer/known-issues#false-positive-dependencies`
+- Signing keys — `customer/signing-keys`
+- Add a new trusted key — `customer/signing-keys#add-a-new-trusted-key`
+- Create a signing key pair — `customer/signing-keys#create-a-signing-key-pair`
+- Sign packages to upload artifacts — `customer/signing-keys#sign-packages-to-upload-artifacts`
+- Trust a public key to install published artifacts — `customer/signing-keys#trust-a-public-key-to-install-published-artifacts`
+- Verify that the key is now trusted — `customer/signing-keys#verify-that-the-key-is-now-trusted`
+## Flox in 5 minutes
+- Flox in 5 minutes — `flox-5-minutes`
+- Activate and explore — `flox-5-minutes#activate-and-explore`
+- Clone the sample project — `flox-5-minutes#clone-the-sample-project`
+- Managing packages — `flox-5-minutes#managing-packages`
+- Push to FloxHub — `flox-5-minutes#push-to-floxhub`
+- Services — `flox-5-minutes#services`
+- What's next — `flox-5-minutes#whats-next`
+## Imageless Kubernetes
+- Configuration — `imageless-kubernetes/config`
+- Activation mode — `imageless-kubernetes/config#activation-mode`
+- Authentication — `imageless-kubernetes/config#authentication`
+- Disabling telemetry — `imageless-kubernetes/config#disabling-telemetry`
+- Generations — `imageless-kubernetes/config#generations`
+- Mixed Flox non-Flox pods — `imageless-kubernetes/config#mixed-flox-non-flox-pods`
+- Mutability — `imageless-kubernetes/config#mutability`
+- Telemetry — `imageless-kubernetes/config#telemetry`
+- GitLab CI — `imageless-kubernetes/examples/gitlab-ci`
+- Conclusion — `imageless-kubernetes/examples/gitlab-ci#conclusion`
+- GitLab job configuration — `imageless-kubernetes/examples/gitlab-ci#gitlab-job-configuration`
+- GitLab runner configuration — `imageless-kubernetes/examples/gitlab-ci#gitlab-runner-configuration`
+- Web server with Redis — `imageless-kubernetes/examples/kind-demo`
+- Cleaning up — `imageless-kubernetes/examples/kind-demo#cleaning-up`
+- Quotes app environment — `imageless-kubernetes/examples/kind-demo#quotes-app-environment`
+- Redis environment — `imageless-kubernetes/examples/kind-demo#redis-environment`
+- Running the example — `imageless-kubernetes/examples/kind-demo#running-the-example`
+- Updating the deployment — `imageless-kubernetes/examples/kind-demo#updating-the-deployment`
+- Amazon EKS — `imageless-kubernetes/install/eks`
+- Conclusion — `imageless-kubernetes/install/eks#conclusion`
+- eksctl Prerequisites — `imageless-kubernetes/install/eks#eksctl-prerequisites`
+- Installation — `imageless-kubernetes/install/eks#installation`
+- Kubernetes Configuration — `imageless-kubernetes/install/eks#kubernetes-configuration`
+- Node Configuration via eksctl — `imageless-kubernetes/install/eks#node-configuration-via-eksctl`
+- Node Configuration via Terraform — `imageless-kubernetes/install/eks#node-configuration-via-terraform`
+- Terraform node group creation — `imageless-kubernetes/install/eks#terraform-node-group-creation`
+- Terraform Prerequisites — `imageless-kubernetes/install/eks#terraform-prerequisites`
+- Versioning — `imageless-kubernetes/install/eks#versioning`
+- Self-managed — `imageless-kubernetes/install/self-managed`
+- Conclusion — `imageless-kubernetes/install/self-managed#conclusion`
+- Flox installation — `imageless-kubernetes/install/self-managed#flox-installation`
+- Kubernetes configuration — `imageless-kubernetes/install/self-managed#kubernetes-configuration`
+- Node configuration — `imageless-kubernetes/install/self-managed#node-configuration`
+- Runtime shim installation — `imageless-kubernetes/install/self-managed#runtime-shim-installation`
+- Troubleshooting — `imageless-kubernetes/install/troubleshooting`
+- Configuration conflicts — `imageless-kubernetes/install/troubleshooting#configuration-conflicts`
+- EKS node shim installation failure — `imageless-kubernetes/install/troubleshooting#eks-node-shim-installation-failure`
+- Pods stuck in ContainerCreating — `imageless-kubernetes/install/troubleshooting#pods-stuck-in-containercreating`
+- Uninstall — `imageless-kubernetes/install/uninstall`
+- Amazon EKS — `imageless-kubernetes/install/uninstall#amazon-eks`
+- eksctl — `imageless-kubernetes/install/uninstall#eksctl`
+- Self-managed — `imageless-kubernetes/install/uninstall#self-managed`
+- Terraform — `imageless-kubernetes/install/uninstall#terraform`
+- Upgrading — `imageless-kubernetes/install/upgrading`
+- Amazon EKS — `imageless-kubernetes/install/upgrading#amazon-eks`
+- Self-managed — `imageless-kubernetes/install/upgrading#self-managed`
+- Introduction — `imageless-kubernetes/intro`
+- Centralized management — `imageless-kubernetes/intro#centralized-management`
+- Syntax — `imageless-kubernetes/intro#syntax`
+- Trying it out — `imageless-kubernetes/intro#trying-it-out`
+- Workflow — `imageless-kubernetes/intro#workflow`
+- Tech — `imageless-kubernetes/tech`
+- containerd-shim — `imageless-kubernetes/tech#containerd-shim`
+## Install Flox
+- Extensions — `install-flox/ide-extensions`
+- Build and install from source — `install-flox/ide-extensions#build-and-install-from-source`
+- Claude Code — `install-flox/ide-extensions#claude-code`
+- Install from the Marketplace — `install-flox/ide-extensions#install-from-the-marketplace`
+- Learn more — `install-flox/ide-extensions#learn-more`
+- MCP server — `install-flox/ide-extensions#mcp-server`
+- Other agents skills.sh — `install-flox/ide-extensions#other-agents-skillssh`
+- Source code — `install-flox/ide-extensions#source-code`
+- Install — `install-flox/install`
+- Troubleshooting — `install-flox/troubleshooting`
+- Common problems — `install-flox/troubleshooting#common-problems`
+- Finding install logs — `install-flox/troubleshooting#finding-install-logs`
+- Flox builds from source when installed as a Nix flake input — `install-flox/troubleshooting#flox-builds-from-source-when-installed-as-a-nix-flake-input`
+- Homebrew uninstall did not fully clean up macOS — `install-flox/troubleshooting#homebrew-uninstall-did-not-fully-clean-up-macos`
+- Linux — `install-flox/troubleshooting#linux`
+- macOS — `install-flox/troubleshooting#macos`
+- Orphaned Nix build users macOS — `install-flox/troubleshooting#orphaned-nix-build-users-macos`
+- Previous Nix installation — `install-flox/troubleshooting#previous-nix-installation`
+- Reporting issues — `install-flox/troubleshooting#reporting-issues`
+- Solution: manually cleanup previous installation state — `install-flox/troubleshooting#solution-manually-cleanup-previous-installation-state`
+- Solution: remove the previous Nix installation — `install-flox/troubleshooting#solution-remove-the-previous-nix-installation`
+- Uninstall — `install-flox/uninstall`
+## Introduction
+- Introduction — `index`
+- And more — `index#and-more`
+- Consistent builds from local to CI to production — `index#consistent-builds-from-local-to-ci-to-production`
+- Cross-platform package management for your whole system — `index#cross-platform-package-management-for-your-whole-system`
+- Get Started — `index#get-started`
+- Have questions — `index#have-questions`
+- Reproducible dev environments — `index#reproducible-dev-environments`
+- Why Flox — `index#why-flox`
+## Languages
+- C/C++ — `languages/c`
+- Build with Flox — `languages/c#build-with-flox`
+- Manifest builds — `languages/c#manifest-builds`
+- Nix expression builds — `languages/c#nix-expression-builds`
+- Go — `languages/go`
+- Build with Flox — `languages/go#build-with-flox`
+- Manifest builds — `languages/go#manifest-builds`
+- Nix expression builds — `languages/go#nix-expression-builds`
+- JVM — `languages/jvm`
+- Build with Flox — `languages/jvm#build-with-flox`
+- Manifest builds — `languages/jvm#manifest-builds`
+- Node.js — `languages/nodejs`
+- Build with Flox — `languages/nodejs#build-with-flox`
+- Manifest builds — `languages/nodejs#manifest-builds`
+- Nix expression builds — `languages/nodejs#nix-expression-builds`
+- Python — `languages/python`
+- Activate and verify the environment — `languages/python#activate-and-verify-the-environment`
+- Activate the new environment — `languages/python#activate-the-new-environment`
+- Add Python packages — `languages/python#add-python-packages`
+- Add system packages — `languages/python#add-system-packages`
+- Auto-initialize the environment — `languages/python#auto-initialize-the-environment`
+- Build with Flox — `languages/python#build-with-flox`
+- Manifest builds — `languages/python#manifest-builds`
+- Select a Python interpreter — `languages/python#select-a-python-interpreter`
+- Using Flox in a new project — `languages/python#using-flox-in-a-new-project`
+- Using Flox in an existing project — `languages/python#using-flox-in-an-existing-project`
+- Ruby — `languages/ruby`
+- Build with Flox — `languages/ruby#build-with-flox`
+- Manifest builds — `languages/ruby#manifest-builds`
+- Rust — `languages/rust`
+- Add cargo aliases — `languages/rust#add-cargo-aliases`
+- Add the target directory to PATH — `languages/rust#add-the-target-directory-to-path`
+- Build with Flox — `languages/rust#build-with-flox`
+- How do I use nightly compilers — `languages/rust#how-do-i-use-nightly-compilers`
+- Manifest builds — `languages/rust#manifest-builds`
+- Nix expression builds — `languages/rust#nix-expression-builds`
+- What do I need for a basic environment — `languages/rust#what-do-i-need-for-a-basic-environment`
+## Manual
+- flox — `man/flox`
+- Additional Commands — `man/flox#additional-commands`
+- Command Line Completions — `man/flox#command-line-completions`
+- COMMANDS — `man/flox#commands`
+- DESCRIPTION — `man/flox#description`
+- ENVIRONMENT VARIABLES — `man/flox#environment-variables`
+- Flox Options — `man/flox#flox-options`
+- General Options — `man/flox#general-options`
+- Local Development Commands — `man/flox#local-development-commands`
+- NAME — `man/flox#name`
+- OPTIONS — `man/flox#options`
+- SEE ALSO — `man/flox#see-also`
+- Sharing Commands — `man/flox#sharing-commands`
+- SYNOPSIS — `man/flox#synopsis`
+- flox activate — `man/flox-activate`
+- Activate Options — `man/flox-activate#activate-options`
+- DESCRIPTION — `man/flox-activate#description`
+- Environment Options — `man/flox-activate#environment-options`
+- ENVIRONMENT VARIABLES — `man/flox-activate#environment-variables`
+- EXAMPLES — `man/flox-activate#examples`
+- General Options — `man/flox-activate#general-options`
+- NAME — `man/flox-activate#name`
+- OPTIONS — `man/flox-activate#options`
+- SEE ALSO — `man/flox-activate#see-also`
+- SYNOPSIS — `man/flox-activate#synopsis`
+- Variables set by flox activate — `man/flox-activate#variables-set-by-flox-activate`
+- Variables used by flox activate — `man/flox-activate#variables-used-by-flox-activate`
+- flox auth — `man/flox-auth`
+- DESCRIPTION — `man/flox-auth#description`
+- login — `man/flox-auth#login`
+- logout — `man/flox-auth#logout`
+- NAME — `man/flox-auth#name`
+- status — `man/flox-auth#status`
+- SUBCOMMANDS — `man/flox-auth#subcommands`
+- SYNOPSIS — `man/flox-auth#synopsis`
+- token — `man/flox-auth#token`
+- flox build — `man/flox-build`
+- Building a simple multi-stage app — `man/flox-build#building-a-simple-multi-stage-app`
+- Building a simple pure package — `man/flox-build#building-a-simple-pure-package`
+- DESCRIPTION — `man/flox-build#description`
+- Environment Options — `man/flox-build#environment-options`
+- EXAMPLES — `man/flox-build#examples`
+- General Options — `man/flox-build#general-options`
+- Manifest-defined packages — `man/flox-build#manifest-defined-packages`
+- NAME — `man/flox-build#name`
+- OPTIONS — `man/flox-build#options`
+- SEE ALSO — `man/flox-build#see-also`
+- SYNOPSIS — `man/flox-build#synopsis`
+- flox build clean — `man/flox-build-clean`
+- DESCRIPTION — `man/flox-build-clean#description`
+- Environment Options — `man/flox-build-clean#environment-options`
+- General Options — `man/flox-build-clean#general-options`
+- NAME — `man/flox-build-clean#name`
+- OPTIONS — `man/flox-build-clean#options`
+- SEE ALSO — `man/flox-build-clean#see-also`
+- SYNOPSIS — `man/flox-build-clean#synopsis`
+- flox build import nixpkgs — `man/flox-build-import-nixpkgs`
+- DESCRIPTION — `man/flox-build-import-nixpkgs#description`
+- Environment Options — `man/flox-build-import-nixpkgs#environment-options`
+- EXAMPLES — `man/flox-build-import-nixpkgs#examples`
+- General Options — `man/flox-build-import-nixpkgs#general-options`
+- Import a complex package — `man/flox-build-import-nixpkgs#import-a-complex-package`
+- Import a simple package — `man/flox-build-import-nixpkgs#import-a-simple-package`
+- Import from a specific nixpkgs revision — `man/flox-build-import-nixpkgs#import-from-a-specific-nixpkgs-revision`
+- Import using a specific stability — `man/flox-build-import-nixpkgs#import-using-a-specific-stability`
+- Installable format — `man/flox-build-import-nixpkgs#installable-format`
+- NAME — `man/flox-build-import-nixpkgs#name`
+- NOTES — `man/flox-build-import-nixpkgs#notes`
+- OPTIONS — `man/flox-build-import-nixpkgs#options`
+- Overwrite an existing package — `man/flox-build-import-nixpkgs#overwrite-an-existing-package`
+- SEE ALSO — `man/flox-build-import-nixpkgs#see-also`
+- SYNOPSIS — `man/flox-build-import-nixpkgs#synopsis`
+- flox build update catalogs — `man/flox-build-update-catalogs`
+- DESCRIPTION — `man/flox-build-update-catalogs#description`
+- Environment Options — `man/flox-build-update-catalogs#environment-options`
+- EXAMPLES — `man/flox-build-update-catalogs#examples`
+- General Options — `man/flox-build-update-catalogs#general-options`
+- Lock catalog inputs — `man/flox-build-update-catalogs#lock-catalog-inputs`
+- NAME — `man/flox-build-update-catalogs#name`
+- OPTIONS — `man/flox-build-update-catalogs#options`
+- SEE ALSO — `man/flox-build-update-catalogs#see-also`
+- SYNOPSIS — `man/flox-build-update-catalogs#synopsis`
+- flox config — `man/flox-config`
+- Config Options — `man/flox-config#config-options`
+- DESCRIPTION — `man/flox-config#description`
+- ENVIRONMENT VARIABLES — `man/flox-config#environment-variables`
+- General Options — `man/flox-config#general-options`
+- Key Format — `man/flox-config#key-format`
+- NAME — `man/flox-config#name`
+- OPTIONS — `man/flox-config#options`
+- SUPPORTED CONFIGURATION OPTIONS — `man/flox-config#supported-configuration-options`
+- SYNOPSIS — `man/flox-config#synopsis`
+- flox containerize — `man/flox-containerize`
+- DESCRIPTION — `man/flox-containerize#description`
+- Environment Options — `man/flox-containerize#environment-options`
+- EXAMPLES — `man/flox-containerize#examples`
+- General Options — `man/flox-containerize#general-options`
+- MANIFEST CONFIGURATION — `man/flox-containerize#manifest-configuration`
+- NAME — `man/flox-containerize#name`
+- OPTIONS — `man/flox-containerize#options`
+- SEE ALSO — `man/flox-containerize#see-also`
+- SYNOPSIS — `man/flox-containerize#synopsis`
+- flox deactivate — `man/flox-deactivate`
+- DESCRIPTION — `man/flox-deactivate#description`
+- EXAMPLES — `man/flox-deactivate#examples`
+- General Options — `man/flox-deactivate#general-options`
+- Interactive subshells — `man/flox-deactivate#interactive-subshells`
+- NAME — `man/flox-deactivate#name`
+- OPTIONS — `man/flox-deactivate#options`
+- SEE ALSO — `man/flox-deactivate#see-also`
+- SYNOPSIS — `man/flox-deactivate#synopsis`
+- flox delete — `man/flox-delete`
+- Delete Options — `man/flox-delete#delete-options`
+- DESCRIPTION — `man/flox-delete#description`
+- Environment Options — `man/flox-delete#environment-options`
+- General Options — `man/flox-delete#general-options`
+- NAME — `man/flox-delete#name`
+- OPTIONS — `man/flox-delete#options`
+- SEE ALSO — `man/flox-delete#see-also`
+- SYNOPSIS — `man/flox-delete#synopsis`
+- flox edit — `man/flox-edit`
+- DESCRIPTION — `man/flox-edit#description`
+- Edit Options — `man/flox-edit#edit-options`
+- Environment Options — `man/flox-edit#environment-options`
+- ENVIRONMENT VARIABLES — `man/flox-edit#environment-variables`
+- General Options — `man/flox-edit#general-options`
+- NAME — `man/flox-edit#name`
+- OPTIONS — `man/flox-edit#options`
+- SEE ALSO — `man/flox-edit#see-also`
+- Sync the local manifest with the current generation — `man/flox-edit#sync-the-local-manifest-with-the-current-generation`
+- SYNOPSIS — `man/flox-edit#synopsis`
+- Transactionally edit the environment manifest — `man/flox-edit#transactionally-edit-the-environment-manifest`
+- flox envs — `man/flox-envs`
+- DESCRIPTION — `man/flox-envs#description`
+- Envs Options — `man/flox-envs#envs-options`
+- General Options — `man/flox-envs#general-options`
+- NAME — `man/flox-envs#name`
+- OPTIONS — `man/flox-envs#options`
+- SEE ALSO — `man/flox-envs#see-also`
+- SYNOPSIS — `man/flox-envs#synopsis`
+- flox gc — `man/flox-gc`
+- DESCRIPTION — `man/flox-gc#description`
+- General Options — `man/flox-gc#general-options`
+- NAME — `man/flox-gc#name`
+- OPTIONS — `man/flox-gc#options`
+- SEE ALSO — `man/flox-gc#see-also`
+- SYNOPSIS — `man/flox-gc#synopsis`
+- flox generations history — `man/flox-generations-history`
+- DESCRIPTION — `man/flox-generations-history#description`
+- Environment Options — `man/flox-generations-history#environment-options`
+- General Options — `man/flox-generations-history#general-options`
+- NAME — `man/flox-generations-history#name`
+- OPTIONS — `man/flox-generations-history#options`
+- SEE ALSO — `man/flox-generations-history#see-also`
+- SYNOPSIS — `man/flox-generations-history#synopsis`
+- flox generations list — `man/flox-generations-list`
+- DESCRIPTION — `man/flox-generations-list#description`
+- Environment Options — `man/flox-generations-list#environment-options`
+- General Options — `man/flox-generations-list#general-options`
+- NAME — `man/flox-generations-list#name`
+- OPTIONS — `man/flox-generations-list#options`
+- SEE ALSO — `man/flox-generations-list#see-also`
+- SYNOPSIS — `man/flox-generations-list#synopsis`
+- flox generations rollback — `man/flox-generations-rollback`
+- DESCRIPTION — `man/flox-generations-rollback#description`
+- Environment Options — `man/flox-generations-rollback#environment-options`
+- General Options — `man/flox-generations-rollback#general-options`
+- NAME — `man/flox-generations-rollback#name`
+- OPTIONS — `man/flox-generations-rollback#options`
+- SEE ALSO — `man/flox-generations-rollback#see-also`
+- SYNOPSIS — `man/flox-generations-rollback#synopsis`
+- flox generations switch — `man/flox-generations-switch`
+- DESCRIPTION — `man/flox-generations-switch#description`
+- Environment Options — `man/flox-generations-switch#environment-options`
+- General Options — `man/flox-generations-switch#general-options`
+- NAME — `man/flox-generations-switch#name`
+- OPTIONS — `man/flox-generations-switch#options`
+- SEE ALSO — `man/flox-generations-switch#see-also`
+- SYNOPSIS — `man/flox-generations-switch#synopsis`
+- flox include upgrade — `man/flox-include-upgrade`
+- DESCRIPTION — `man/flox-include-upgrade#description`
+- Environment Options — `man/flox-include-upgrade#environment-options`
+- General Options — `man/flox-include-upgrade#general-options`
+- NAME — `man/flox-include-upgrade#name`
+- OPTIONS — `man/flox-include-upgrade#options`
+- SEE ALSO — `man/flox-include-upgrade#see-also`
+- SYNOPSIS — `man/flox-include-upgrade#synopsis`
+- flox init — `man/flox-init`
+- Common Init Options — `man/flox-init#common-init-options`
+- DESCRIPTION — `man/flox-init#description`
+- General Options — `man/flox-init#general-options`
+- NAME — `man/flox-init#name`
+- OPTIONS — `man/flox-init#options`
+- Options to initialize a local environment — `man/flox-init#options-to-initialize-a-local-environment`
+- Options to initialize an environment on FloxHub — `man/flox-init#options-to-initialize-an-environment-on-floxhub`
+- SEE ALSO — `man/flox-init#see-also`
+- SYNOPSIS — `man/flox-init#synopsis`
+- flox install — `man/flox-install`
+- DESCRIPTION — `man/flox-install#description`
+- Environment Options — `man/flox-install#environment-options`
+- General Options — `man/flox-install#general-options`
+- Install ID — `man/flox-install#install-id`
+- Install Options — `man/flox-install#install-options`
+- NAME — `man/flox-install#name`
+- OPTIONS — `man/flox-install#options`
+- Package names — `man/flox-install#package-names`
+- SEE ALSO — `man/flox-install#see-also`
+- SYNOPSIS — `man/flox-install#synopsis`
+- flox list — `man/flox-list`
+- DESCRIPTION — `man/flox-list#description`
+- Environment Options — `man/flox-list#environment-options`
+- General Options — `man/flox-list#general-options`
+- List Options — `man/flox-list#list-options`
+- NAME — `man/flox-list#name`
+- OPTIONS — `man/flox-list#options`
+- SEE ALSO — `man/flox-list#see-also`
+- SYNOPSIS — `man/flox-list#synopsis`
+- flox publish — `man/flox-publish`
+- After publishing — `man/flox-publish#after-publishing`
+- DESCRIPTION — `man/flox-publish#description`
+- Environment Options — `man/flox-publish#environment-options`
+- General Options — `man/flox-publish#general-options`
+- NAME — `man/flox-publish#name`
+- OPTIONS — `man/flox-publish#options`
+- Preconditions — `man/flox-publish#preconditions`
+- Publishing process — `man/flox-publish#publishing-process`
+- SEE ALSO — `man/flox-publish#see-also`
+- Sharing published packages — `man/flox-publish#sharing-published-packages`
+- SYNOPSIS — `man/flox-publish#synopsis`
+- flox pull — `man/flox-pull`
+- DESCRIPTION — `man/flox-pull#description`
+- General Options — `man/flox-pull#general-options`
+- NAME — `man/flox-pull#name`
+- OPTIONS — `man/flox-pull#options`
+- Platform Support — `man/flox-pull#platform-support`
+- Pull Options — `man/flox-pull#pull-options`
+- Pulling a new environment --dir — `man/flox-pull#pulling-a-new-environment---dir`
+- SEE ALSO — `man/flox-pull#see-also`
+- SYNOPSIS — `man/flox-pull#synopsis`
+- Updating an existing environment in a directory --dir — `man/flox-pull#updating-an-existing-environment-in-a-directory---dir`
+- Updating FloxHub environments --reference — `man/flox-pull#updating-floxhub-environments---reference`
+- flox push — `man/flox-push`
+- Conflict resolution — `man/flox-push#conflict-resolution`
+- DESCRIPTION — `man/flox-push#description`
+- General Options — `man/flox-push#general-options`
+- NAME — `man/flox-push#name`
+- OPTIONS — `man/flox-push#options`
+- Push Options — `man/flox-push#push-options`
+- Pushing a remote environment using --reference -r — `man/flox-push#pushing-a-remote-environment-using---reference--r`
+- Pushing from a directory using --dir -d — `man/flox-push#pushing-from-a-directory-using---dir--d`
+- SEE ALSO — `man/flox-push#see-also`
+- SYNOPSIS — `man/flox-push#synopsis`
+- flox search — `man/flox-search`
+- DESCRIPTION — `man/flox-search#description`
+- Fuzzy search — `man/flox-search#fuzzy-search`
+- General Options — `man/flox-search#general-options`
+- NAME — `man/flox-search#name`
+- OPTIONS — `man/flox-search#options`
+- Package names — `man/flox-search#package-names`
+- Search Options — `man/flox-search#search-options`
+- SEE ALSO — `man/flox-search#see-also`
+- SYNOPSIS — `man/flox-search#synopsis`
+- flox services logs — `man/flox-services-logs`
+- DESCRIPTION — `man/flox-services-logs#description`
+- Environment Options — `man/flox-services-logs#environment-options`
+- EXAMPLES — `man/flox-services-logs#examples`
+- General Options — `man/flox-services-logs#general-options`
+- NAME — `man/flox-services-logs#name`
+- OPTIONS — `man/flox-services-logs#options`
+- SEE ALSO — `man/flox-services-logs#see-also`
+- SYNOPSIS — `man/flox-services-logs#synopsis`
+- flox services restart — `man/flox-services-restart`
+- DESCRIPTION — `man/flox-services-restart#description`
+- Environment Options — `man/flox-services-restart#environment-options`
+- EXAMPLES — `man/flox-services-restart#examples`
+- General Options — `man/flox-services-restart#general-options`
+- NAME — `man/flox-services-restart#name`
+- OPTIONS — `man/flox-services-restart#options`
+- SEE ALSO — `man/flox-services-restart#see-also`
+- SYNOPSIS — `man/flox-services-restart#synopsis`
+- flox services start — `man/flox-services-start`
+- DESCRIPTION — `man/flox-services-start#description`
+- Environment Options — `man/flox-services-start#environment-options`
+- EXAMPLES — `man/flox-services-start#examples`
+- General Options — `man/flox-services-start#general-options`
+- NAME — `man/flox-services-start#name`
+- OPTIONS — `man/flox-services-start#options`
+- SEE ALSO — `man/flox-services-start#see-also`
+- SYNOPSIS — `man/flox-services-start#synopsis`
+- flox services status — `man/flox-services-status`
+- DESCRIPTION — `man/flox-services-status#description`
+- Environment Options — `man/flox-services-status#environment-options`
+- EXAMPLES — `man/flox-services-status#examples`
+- General Options — `man/flox-services-status#general-options`
+- NAME — `man/flox-services-status#name`
+- OPTIONS — `man/flox-services-status#options`
+- SEE ALSO — `man/flox-services-status#see-also`
+- SYNOPSIS — `man/flox-services-status#synopsis`
+- flox services stop — `man/flox-services-stop`
+- DESCRIPTION — `man/flox-services-stop#description`
+- Environment Options — `man/flox-services-stop#environment-options`
+- EXAMPLES — `man/flox-services-stop#examples`
+- General Options — `man/flox-services-stop#general-options`
+- NAME — `man/flox-services-stop#name`
+- OPTIONS — `man/flox-services-stop#options`
+- SEE ALSO — `man/flox-services-stop#see-also`
+- SYNOPSIS — `man/flox-services-stop#synopsis`
+- flox show — `man/flox-show`
+- DESCRIPTION — `man/flox-show#description`
+- EXAMPLES — `man/flox-show#examples`
+- General Options — `man/flox-show#general-options`
+- NAME — `man/flox-show#name`
+- OPTIONS — `man/flox-show#options`
+- Package names — `man/flox-show#package-names`
+- SEE ALSO — `man/flox-show#see-also`
+- Show Options — `man/flox-show#show-options`
+- SYNOPSIS — `man/flox-show#synopsis`
+- flox uninstall — `man/flox-uninstall`
+- DESCRIPTION — `man/flox-uninstall#description`
+- Environment Options — `man/flox-uninstall#environment-options`
+- General Options — `man/flox-uninstall#general-options`
+- NAME — `man/flox-uninstall#name`
+- OPTIONS — `man/flox-uninstall#options`
+- Remove Options — `man/flox-uninstall#remove-options`
+- SEE ALSO — `man/flox-uninstall#see-also`
+- SYNOPSIS — `man/flox-uninstall#synopsis`
+- flox upgrade — `man/flox-upgrade`
+- DESCRIPTION — `man/flox-upgrade#description`
+- Environment Options — `man/flox-upgrade#environment-options`
+- General Options — `man/flox-upgrade#general-options`
+- NAME — `man/flox-upgrade#name`
+- OPTIONS — `man/flox-upgrade#options`
+- SEE ALSO — `man/flox-upgrade#see-also`
+- SYNOPSIS — `man/flox-upgrade#synopsis`
+- Upgrade Options — `man/flox-upgrade#upgrade-options`
+- manifest.toml — `man/manifesttoml`
+- build — `man/manifesttoml#build`
+- DESCRIPTION — `man/manifesttoml#description`
+- hook — `man/manifesttoml#hook`
+- include — `man/manifesttoml#include`
+- install — `man/manifesttoml#install`
+- minimum-cli-version — `man/manifesttoml#minimum-cli-version`
+- NAME — `man/manifesttoml#name`
+- options — `man/manifesttoml#options`
+- profile — `man/manifesttoml#profile`
+- schema-version — `man/manifesttoml#schema-version`
+- SEE ALSO — `man/manifesttoml#see-also`
+- services — `man/manifesttoml#services`
+- SYNOPSIS — `man/manifesttoml#synopsis`
+- vars — `man/manifesttoml#vars`
+- nix-builds.toml — `man/nix-buildstoml`
+- catalogs — `man/nix-buildstoml#catalogs`
+- Declare a catalog with a pinned branch — `man/nix-buildstoml#declare-a-catalog-with-a-pinned-branch`
+- Declare a FloxHub catalog — `man/nix-buildstoml#declare-a-floxhub-catalog`
+- Declare a Git catalog — `man/nix-buildstoml#declare-a-git-catalog`
+- DESCRIPTION — `man/nix-buildstoml#description`
+- EXAMPLES — `man/nix-buildstoml#examples`
+- Lockfile — `man/nix-buildstoml#lockfile`
+- NAME — `man/nix-buildstoml#name`
+- SEE ALSO — `man/nix-buildstoml#see-also`
+- SYNOPSIS — `man/nix-buildstoml#synopsis`
+- Use a catalog in a package expression — `man/nix-buildstoml#use-a-catalog-in-a-package-expression`
+- Using catalogs in Nix expressions — `man/nix-buildstoml#using-catalogs-in-nix-expressions`
+- version — `man/nix-buildstoml#version`
+## Tutorials
+- Building and publishing packages — `tutorials/build-and-publish`
+- Conclusion — `tutorials/build-and-publish#conclusion`
+- Define a build — `tutorials/build-and-publish#define-a-build`
+- Define a second build — `tutorials/build-and-publish#define-a-second-build`
+- Install the package — `tutorials/build-and-publish#install-the-package`
+- Perform a build — `tutorials/build-and-publish#perform-a-build`
+- Prepare a project — `tutorials/build-and-publish#prepare-a-project`
+- Publish the package — `tutorials/build-and-publish#publish-the-package`
+- Running Flox in CI/CD — `tutorials/ci-cd`
+- CircleCI — `tutorials/ci-cd#circleci`
+- Github Actions — `tutorials/ci-cd#github-actions`
+- GitLab — `tutorials/ci-cd#gitlab`
+- Suggestions — `tutorials/ci-cd#suggestions`
+- Where to next — `tutorials/ci-cd#where-to-next`
+- Reusing and combining developer environments — `tutorials/composition`
+- Composing environments — `tutorials/composition#composing-environments`
+- Conclusion — `tutorials/composition#conclusion`
+- Create a reusable toolchain — `tutorials/composition#create-a-reusable-toolchain`
+- Creating a composed environment — `tutorials/composition#creating-a-composed-environment`
+- Creating a template for new projects — `tutorials/composition#creating-a-template-for-new-projects`
+- Getting the latest versions of included environments — `tutorials/composition#getting-the-latest-versions-of-included-environments`
+- Including FloxHub environments — `tutorials/composition#including-floxhub-environments`
+- Installing project specific dependencies — `tutorials/composition#installing-project-specific-dependencies`
+- Staying in sync with the template — `tutorials/composition#staying-in-sync-with-the-template`
+- Template environments — `tutorials/composition#template-environments`
+- Creating environments — `tutorials/creating-environments`
+- Customize the shell hook and environment variables — `tutorials/creating-environments#customize-the-shell-hook-and-environment-variables`
+- Enter and use the environment — `tutorials/creating-environments#enter-and-use-the-environment`
+- Exit the environment — `tutorials/creating-environments#exit-the-environment`
+- Initialize a project — `tutorials/creating-environments#initialize-a-project`
+- Search, show, and install packages — `tutorials/creating-environments#search-show-and-install-packages`
+- Where to next — `tutorials/creating-environments#where-to-next`
+- Flox + CUDA — `tutorials/cuda`
+- Conclusion — `tutorials/cuda#conclusion`
+- HSOpticalFlow example — `tutorials/cuda#hsopticalflow-example`
+- Julia set — `tutorials/cuda#julia-set`
+- Official CUDA examples — `tutorials/cuda#official-cuda-examples`
+- PyTorch — `tutorials/cuda#pytorch`
+- Customizing the shell environment — `tutorials/customizing-environments`
+- Adding a directory to PATH — `tutorials/customizing-environments#adding-a-directory-to-path`
+- Adding shell aliases — `tutorials/customizing-environments#adding-shell-aliases`
+- Enabling feature flags — `tutorials/customizing-environments#enabling-feature-flags`
+- Setup — `tutorials/customizing-environments#setup`
+- Vars, hook, or profile — `tutorials/customizing-environments#vars-hook-or-profile`
+- Where to next — `tutorials/customizing-environments#where-to-next`
+- Why do I need to exit and re-activate — `tutorials/customizing-environments#why-do-i-need-to-exit-and-re-activate`
+- The default environment — `tutorials/default-environment`
+- Conclusion — `tutorials/default-environment#conclusion`
+- Customization — `tutorials/default-environment#customization`
+- Detached and directory based default environments — `tutorials/default-environment#detached-and-directory-based-default-environments`
+- Generations — `tutorials/default-environment#generations`
+- Initial setup — `tutorials/default-environment#initial-setup`
+- Installing packages to the default environment from another Flox environment — `tutorials/default-environment#installing-packages-to-the-default-environment-from-another-flox-environment`
+- Sharing — `tutorials/default-environment#sharing`
+- Taking it for a spin — `tutorials/default-environment#taking-it-for-a-spin`
+- Flox and systemd — `tutorials/flox-and-systemd`
+- Constraints — `tutorials/flox-and-systemd#constraints`
+- Create a dedicated Redis user and environment — `tutorials/flox-and-systemd#create-a-dedicated-redis-user-and-environment`
+- Create the Redis environment locally — `tutorials/flox-and-systemd#create-the-redis-environment-locally`
+- Create the system unit file — `tutorials/flox-and-systemd#create-the-system-unit-file`
+- Create the systemd user service — `tutorials/flox-and-systemd#create-the-systemd-user-service`
+- Load, enable, and start — `tutorials/flox-and-systemd#load-enable-and-start`
+- Prerequisites — `tutorials/flox-and-systemd#prerequisites`
+- Run a Flox environment service as a systemd system unit — `tutorials/flox-and-systemd#run-a-flox-environment-service-as-a-systemd-system-unit`
+- Run a Flox environment service as a systemd user unit — `tutorials/flox-and-systemd#run-a-flox-environment-service-as-a-systemd-user-unit`
+- System unit cleanup — `tutorials/flox-and-systemd#system-unit-cleanup`
+- Test the environment with Flox services — `tutorials/flox-and-systemd#test-the-environment-with-flox-services`
+- User unit cleanup — `tutorials/flox-and-systemd#user-unit-cleanup`
+- Verify — `tutorials/flox-and-systemd#verify`
+- Where to next — `tutorials/flox-and-systemd#where-to-next`
+- Installing Flox from its repository on Debian and Red Hat — `tutorials/installing-from-repo`
+- Debian-based systems — `tutorials/installing-from-repo#debian-based-systems`
+- Installation overview — `tutorials/installing-from-repo#installation-overview`
+- Installing from Flox's repository using yum — `tutorials/installing-from-repo#installing-from-floxs-repository-using-yum`
+- Red Hat-based systems — `tutorials/installing-from-repo#red-hat-based-systems`
+- Removing on Debian-based systems — `tutorials/installing-from-repo#removing-on-debian-based-systems`
+- Removing on Red Hat-based systems — `tutorials/installing-from-repo#removing-on-red-hat-based-systems`
+- Removing the Flox repository — `tutorials/installing-from-repo#removing-the-flox-repository`
+- Where to next — `tutorials/installing-from-repo#where-to-next`
+- Layering multiple environments — `tutorials/layering-multiple-environments`
+- Create your default $HOME environment — `tutorials/layering-multiple-environments#create-your-default-home-environment`
+- Install packages — `tutorials/layering-multiple-environments#install-packages`
+- Layering a project environment — `tutorials/layering-multiple-environments#layering-a-project-environment`
+- Where to next — `tutorials/layering-multiple-environments#where-to-next`
+- Homebrew — `tutorials/migrations/homebrew`
+- Complete the migration — `tutorials/migrations/homebrew#complete-the-migration`
+- Create environments for projects — `tutorials/migrations/homebrew#create-environments-for-projects`
+- Install Flox — `tutorials/migrations/homebrew#install-flox`
+- Install your first package — `tutorials/migrations/homebrew#install-your-first-package`
+- Migrate your first package — `tutorials/migrations/homebrew#migrate-your-first-package`
+- Option 1: Uninstall Homebrew — `tutorials/migrations/homebrew#option-1-uninstall-homebrew`
+- Option 2: Use Flox and Homebrew together — `tutorials/migrations/homebrew#option-2-use-flox-and-homebrew-together`
+- Search for a package in Flox — `tutorials/migrations/homebrew#search-for-a-package-in-flox`
+- Show top-level formulae in Homebrew — `tutorials/migrations/homebrew#show-top-level-formulae-in-homebrew`
+- Verify configuration — `tutorials/migrations/homebrew#verify-configuration`
+- Why you might want to migrate — `tutorials/migrations/homebrew#why-you-might-want-to-migrate`
+- Node Version Manager (nvm) — `tutorials/migrations/nvm`
+- Add Node.js and associated dependencies to a package group optional — `tutorials/migrations/nvm#add-nodejs-and-associated-dependencies-to-a-package-group-optional`
+- Create a Flox environment in your existing project and install Node.js — `tutorials/migrations/nvm#create-a-flox-environment-in-your-existing-project-and-install-nodejs`
+- Install Flox — `tutorials/migrations/nvm#install-flox`
+- Install other dependencies using Flox optional — `tutorials/migrations/nvm#install-other-dependencies-using-flox-optional`
+- Remove nvm and related artifacts — `tutorials/migrations/nvm#remove-nvm-and-related-artifacts`
+- Update the Node.js version — `tutorials/migrations/nvm#update-the-nodejs-version`
+- Update the README in your project — `tutorials/migrations/nvm#update-the-readme-in-your-project`
+- Verify the Node.js version — `tutorials/migrations/nvm#verify-the-nodejs-version`
+- Why you might want to use Flox instead of nvm — `tutorials/migrations/nvm#why-you-might-want-to-use-flox-instead-of-nvm`
+- Designing multi-arch environments — `tutorials/multi-arch-environments`
+- Creating an environment — `tutorials/multi-arch-environments#creating-an-environment`
+- Handling unsupported packages — `tutorials/multi-arch-environments#handling-unsupported-packages`
+- Using the environment from a different system type — `tutorials/multi-arch-environments#using-the-environment-from-a-different-system-type`
+- Where to next — `tutorials/multi-arch-environments#where-to-next`
+- Using a newer version of a package — `tutorials/overriding-packages`
+- Build the package — `tutorials/overriding-packages#build-the-package`
+- Create an environment — `tutorials/overriding-packages#create-an-environment`
+- Get the correct hash — `tutorials/overriding-packages#get-the-correct-hash`
+- Install from another environment — `tutorials/overriding-packages#install-from-another-environment`
+- Next steps — `tutorials/overriding-packages#next-steps`
+- Publish the package — `tutorials/overriding-packages#publish-the-package`
+- Scenario — `tutorials/overriding-packages#scenario`
+- Set up Git — `tutorials/overriding-packages#set-up-git`
+- Write the override — `tutorials/overriding-packages#write-the-override`
+- Selecting package outputs — `tutorials/package-outputs`
+- Conclusion — `tutorials/package-outputs#conclusion`
+- Discovering outputs — `tutorials/package-outputs#discovering-outputs`
+- Selecting outputs — `tutorials/package-outputs#selecting-outputs`
+- Which output do I want — `tutorials/package-outputs#which-output-do-i-want`
+- Why — `tutorials/package-outputs#why`
+- Sharing environments — `tutorials/sharing-environments`
+- Pulling a FloxHub environment into a directory and pushing updates — `tutorials/sharing-environments#pulling-a-floxhub-environment-into-a-directory-and-pushing-updates`
+- Sharing environments on FloxHub — `tutorials/sharing-environments#sharing-environments-on-floxhub`
+- Sharing environments with files — `tutorials/sharing-environments#sharing-environments-with-files`
+- Sharing with containers — `tutorials/sharing-environments#sharing-with-containers`
+- Using a local copy of a FloxHub environment — `tutorials/sharing-environments#using-a-local-copy-of-a-floxhub-environment`
+- Where to next — `tutorials/sharing-environments#where-to-next`

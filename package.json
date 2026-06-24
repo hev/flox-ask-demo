@@ -1,0 +1,21 @@
+{
+  "name": "flox-ask-demo",
+  "private": true,
+  "type": "module",
+  "description": "Demo of @hevmind/ask (⌘K agentic docs search) over Flox's published documentation.",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro build",
+    "preview": "wrangler pages dev ./dist",
+    "deploy": "astro build && wrangler pages deploy",
+    "ingest": "node scripts/ingest.mjs --write"
+  },
+  "dependencies": {
+    "@astrojs/cloudflare": "^12.6.10",
+    "@hevmind/ask": "^0.3.4",
+    "astro": "^5.0.0"
+  },
+  "devDependencies": {
+    "wrangler": "^4.0.0"
+  }
+}

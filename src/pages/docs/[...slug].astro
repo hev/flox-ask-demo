@@ -1,0 +1,22 @@
+---
+import { getCollection, render } from 'astro:content';
+import DocLayout from '../../layouts/DocLayout.astro';
+
+export const prerender = true;
+
+export async function getStaticPaths() {
+  const docs = await getCollection('docs');
+  return docs.map((doc) => ({
+    // The Introduction (index.md) lives at /docs/ ; everything else keeps its id.
+    params: { slug: doc.id === 'index' ? undefined : doc.id },
+    props: { doc },
+  }));
+}
+
+const { doc } = Astro.props;
+const { Content } = await render(doc);
+---
+
+<DocLayout title={doc.data.title} group={doc.data.group}>
+  <Content />
+</DocLayout>

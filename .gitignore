@@ -1,0 +1,9 @@
+node_modules/
+dist/
+.astro/
+.wrangler/
+.dev.vars
+*.log
+.DS_Store
+# Local digest build cache (the committed .hev-ask/ tree is kept; shards are not)
+.hev-ask/shards/

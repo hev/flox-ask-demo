@@ -1,0 +1,251 @@
+---
+import SearchOverlay from '@hevmind/ask/components/SearchOverlay.astro';
+import { getCollection } from 'astro:content';
+
+interface Props {
+  title: string;
+  group?: string;
+}
+const { title, group } = Astro.props;
+
+const docs = await getCollection('docs');
+const ORDER = [
+  'Introduction',
+  'Install Flox',
+  'Flox in 5 minutes',
+  'Tutorials',
+  'Imageless Kubernetes',
+  'Concepts',
+  'Languages',
+  'Customer',
+  'Manual',
+  'More',
+];
+const rank = (g: string) => {
+  const i = ORDER.indexOf(g);
+  return i < 0 ? ORDER.length : i;
+};
+const href = (id: string) => (id === 'index' ? '/docs/' : `/docs/${id}`);
+
+const groups = new Map<string, { id: string; title: string; order: number }[]>();
+for (const d of docs) {
+  const g = d.data.group ?? 'More';
+  if (!groups.has(g)) groups.set(g, []);
+  groups.get(g)!.push({ id: d.id, title: d.data.title, order: d.data.order ?? 9999 });
+}
+for (const items of groups.values()) items.sort((a, b) => a.order - b.order || a.title.localeCompare(b.title));
+const nav = [...groups.entries()].sort((a, b) => rank(a[0]) - rank(b[0]) || a[0].localeCompare(b[0]));
+const current = Astro.url.pathname.replace(/\/$/, '') || '/docs';
+// A group with a single page whose title is the group name renders as a plain link.
+const isStandalone = (g: string, items: { title: string }[]) => items.length === 1 && items[0].title === g;
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title} · Flox Docs</title>
+    <link rel="icon" href="/flox-logo.png" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500;700&display=swap"
+      rel="stylesheet"
+    />
+    <!-- PostHog analytics -->
+    <script is:inline>
+      !function(t,e){var o,n,p,r;e.__SV||(window.posthog=e,e._i=[],e.init=function(i,s,a){function g(t,e){var o=e.split(".");2==o.length&&(t=t[o[0]],e=o[1]),t[e]=function(){t.push([e].concat(Array.prototype.slice.call(arguments,0)))}}(p=t.createElement("script")).type="text/javascript",p.crossOrigin="anonymous",p.async=!0,p.src=s.api_host.replace(".i.posthog.com","-assets.i.posthog.com")+"/static/array.js",(r=t.getElementsByTagName("script")[0]).parentNode.insertBefore(p,r);var u=e;for(void 0!==a?u=e[a]=[]:a="posthog",u.people=u.people||[],u.toString=function(t){var e="posthog";return"posthog"!==a&&(e+="."+a),t||(e+=" (stub)"),e},u.people.toString=function(){return u.toString(1)+".people (stub)"},o="init capture register register_once register_for_session unregister unregister_for_session getFeatureFlag getFeatureFlagPayload isFeatureEnabled reloadFeatureFlags updateEarlyAccessFeatureEnrollment getEarlyAccessFeatures on onFeatureFlags onSessionId getSurveys getActiveMatchingSurveys renderSurvey canRenderSurvey getNextSurveyStep identify setPersonProperties group resetGroups setPersonPropertiesForFlags resetPersonPropertiesForFlags setGroupPropertiesForFlags resetGroupPropertiesForFlags reset get_distinct_id getGroups get_session_id get_session_replay_url alias set_config startSessionRecording stopSessionRecording sessionRecordingStarted captureException loadToolbar get_property getSessionProperty createPersonProfile opt_in_capturing opt_out_capturing has_opted_in_capturing has_opted_out_capturing clear_opt_in_out_capturing debug getPageViewId captureTraceFeedback captureTraceMetric".split(" "),n=0;n<o.length;n++)g(u,o[n]);e._i.push([i,s,a])},e.__SV=1)}(document,window.posthog||[]);
+      posthog.init('phc_rZbCMBpeYIhMWpZCWUycgO512oyAO9RxCFexuWCqVRv',{api_host:'https://us.i.posthog.com',person_profiles:'identified_only',defaults:'2025-05-24'})
+    </script>
+    <style is:global>
+      :root {
+        /* Flox brand (flox/floxdocs css/extra.css): monochrome ink + vivid pink. */
+        --ink: #1b1b1b;
+        --body: #36343a;
+        --dim: #6b6b70;
+        --line: #ececef;
+        --bg: #ffffff;
+        --sidebar: #fbfbfc;
+        --code-bg: #f6f6f7;
+        --pink: #ff4fae;
+        --pink-dark: #e0288d;
+        --sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif;
+        --mono: 'Geist Mono', 'SFMono-Regular', Menlo, monospace;
+        /* hev ask overlay theme hooks — light, Flox palette. */
+        --paper: #ffffff;
+        --muted: #6b6b70;
+        --signal: #ff4fae;
+        --font-mono: 'Geist Mono', 'SFMono-Regular', Menlo, monospace;
+      }
+      * { box-sizing: border-box; }
+      html { scroll-padding-top: 5rem; background: var(--bg); color-scheme: light; }
+      body { margin: 0; background: var(--bg); color: var(--body); font: 16px/1.7 var(--sans); -webkit-font-smoothing: antialiased; }
+
+      /* Demo banner — makes clear this is a hev ask showcase, not official Flox docs */
+      .demo-banner { display: flex; align-items: center; justify-content: center; flex-wrap: wrap;
+                     gap: .35rem .9rem; background: var(--ink); color: #cfcfd4;
+                     font-size: .82rem; line-height: 1.4; padding: .5rem 1rem;
+                     border-bottom: 1px solid #000; }
+      .demo-banner .badge { background: var(--pink); color: #fff; font-weight: 700;
+                            font-family: var(--mono); font-size: .66rem; letter-spacing: .06em;
+                            padding: .12rem .45rem; border-radius: 4px; }
+      .demo-banner strong { color: #fff; }
+      .demo-banner .links { display: inline-flex; gap: 1rem; }
+      .demo-banner a { color: #ff9bd0; text-decoration: none; white-space: nowrap; }
+      .demo-banner a:hover { text-decoration: underline; }
+      @media (max-width: 640px) { .demo-banner .links { width: 100%; justify-content: center; } }
+
+      /* Navbar — dark, like flox.dev */
+      .nav { display: flex; align-items: center; gap: 1.25rem; padding: 0 1.25rem; height: 60px;
+             background: var(--ink); position: sticky; top: 0; z-index: 20; }
+      .brand { display: flex; align-items: center; gap: .6rem; text-decoration: none; }
+      .brand img { height: 26px; width: auto; display: block; }
+      .brand .word { color: #fff; font-weight: 600; font-size: 1.15rem; letter-spacing: -.01em; }
+      .nav .links { display: flex; gap: 1.1rem; margin-left: .5rem; }
+      .nav .links a { color: #d6d6db; text-decoration: none; font-size: .92rem; font-weight: 500; }
+      .nav .links a:hover { color: var(--pink); }
+      .nav .ver { font-family: var(--mono); font-size: .76rem; color: var(--pink); border: 1px solid #38383d;
+                  border-radius: 999px; padding: .15rem .55rem; }
+      .nav .spacer { margin-left: auto; }
+      .nav .demo { font-size: .72rem; color: #fff; background: var(--pink); border-radius: 999px; padding: .18rem .6rem; font-weight: 600; }
+      .nav .search { display: flex; align-items: center; gap: .55rem; background: #242428; color: #b6b6bc;
+                     border: 1px solid #38383d; border-radius: 8px; padding: .42rem .7rem; cursor: pointer;
+                     font: inherit; font-size: .88rem; }
+      .nav .search:hover { border-color: var(--pink); color: #fff; }
+      .nav .search kbd { font-family: var(--mono); font-size: .72rem; border: 1px solid #4a4a50;
+                         border-radius: 5px; padding: 1px 5px; color: #d6d6db; }
+
+      .wrap { display: grid; grid-template-columns: 290px minmax(0, 1fr); gap: 2.5rem;
+              max-width: 1220px; margin: 0 auto; padding: 1.5rem 1.25rem 4rem; }
+
+      /* Sidebar — collapsible groups (96 pages; the Manual alone is 36) */
+      nav.side { font-size: .9rem; position: sticky; top: 4.5rem; align-self: start;
+                 max-height: calc(100vh - 6rem); overflow: auto; padding-right: .5rem; }
+      nav.side details { margin-bottom: .15rem; }
+      nav.side summary { color: var(--ink); font-family: var(--mono); font-size: .74rem; font-weight: 700;
+                         letter-spacing: .02em; text-transform: uppercase; margin: .9rem 0 .35rem; cursor: pointer; list-style: none;
+                         display: flex; align-items: center; gap: .4rem; }
+      nav.side summary::-webkit-details-marker { display: none; }
+      nav.side summary::before { content: '▸'; color: var(--dim); font-size: .7rem; transition: transform .15s; }
+      nav.side details[open] > summary::before { transform: rotate(90deg); }
+      nav.side ul { list-style: none; margin: 0 0 .4rem; padding: 0; border-left: 1px solid var(--line); }
+      nav.side a { display: block; color: var(--dim); text-decoration: none; padding: .2rem 0 .2rem .8rem;
+                   margin-left: -1px; border-left: 2px solid transparent; }
+      nav.side a:hover { color: var(--ink); }
+      nav.side a[aria-current='page'] { color: var(--pink); font-weight: 600; border-left-color: var(--pink); }
+      nav.side a.solo { font-family: var(--mono); font-size: .74rem; font-weight: 700; text-transform: uppercase;
+                        letter-spacing: .02em; color: var(--ink); border-left: none; padding-left: 0; margin: .9rem 0 .35rem; }
+      nav.side a.solo[aria-current='page'] { color: var(--pink); }
+
+      /* Content */
+      main { min-width: 0; }
+      .crumb { color: var(--dim); font-size: .82rem; margin-bottom: .4rem; }
+      main h1 { font-family: var(--mono); font-size: 2rem; line-height: 1.2; color: var(--ink); margin: .1rem 0 1.2rem; letter-spacing: -.02em; }
+      article :is(h2, h3, h4) { font-family: var(--mono); color: var(--ink); scroll-margin-top: 5rem; letter-spacing: -.01em; }
+      article h2 { font-size: 1.4rem; margin-top: 2.2rem; padding-bottom: .3rem; border-bottom: 1px solid var(--line); }
+      article h3 { font-size: 1.12rem; margin-top: 1.6rem; }
+      article a { color: var(--pink-dark); text-decoration: none; }
+      article a:hover { text-decoration: underline; }
+      article p, article li { color: var(--body); }
+      article pre { background: var(--code-bg); border: 1px solid var(--line); border-radius: 8px; padding: 1rem; overflow: auto; font-size: .86rem; }
+      article code { background: var(--code-bg); padding: .12rem .35rem; border-radius: 4px; font-family: var(--mono); font-size: .85em; }
+      article pre code { background: none; padding: 0; }
+      article img, article svg, article video { max-width: 100%; border-radius: 6px; }
+      article table { border-collapse: collapse; width: 100%; font-size: .9rem; display: block; overflow-x: auto; }
+      article th, article td { border: 1px solid var(--line); padding: .45rem .6rem; text-align: left; }
+      article blockquote { border-left: 3px solid var(--pink); margin: 1rem 0; padding: .2rem 1rem; color: var(--dim); background: var(--sidebar); }
+
+      /* Footer */
+      footer { border-top: 1px solid var(--line); background: var(--ink); color: #b6b6bc; }
+      footer .fwrap { max-width: 1220px; margin: 0 auto; padding: 2rem 1.25rem; display: flex; flex-wrap: wrap; gap: 1.5rem; align-items: center; }
+      footer .note { font-size: .85rem; }
+      footer .note b { color: #fff; }
+      footer .lic { margin-left: auto; font-size: .8rem; color: #8b8b91; }
+      footer a { color: #ff9bd0; }
+
+      @media (max-width: 860px) {
+        .wrap { grid-template-columns: 1fr; }
+        nav.side { position: static; max-height: none; }
+        .nav .links { display: none; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="demo-banner">
+      <span class="badge">DEMO</span>
+      <span>
+        A showcase of <strong>hev ask</strong> — <strong>⌘K</strong> agentic search — running on
+        Flox's real docs. Unaffiliated with Flox; not the official documentation.
+      </span>
+      <span class="links">
+        <a href="https://flox.dev/docs" target="_blank" rel="noopener">Official Flox docs ↗</a>
+        <a href="https://hevask.com" target="_blank" rel="noopener">Add ask to your docs ↗</a>
+      </span>
+    </div>
+    <header class="nav">
+      <a class="brand" href="/docs/">
+        <img src="/flox-logo.svg" alt="Flox" height="26" />
+        <span class="word">Flox</span>
+      </a>
+      <div class="links">
+        <a href="/docs/">Docs</a>
+        <a href="/docs/flox-5-minutes">Quick start</a>
+        <a href="/docs/concepts/environments">Concepts</a>
+        <a href="/docs/man/flox">CLI</a>
+      </div>
+      <span class="ver">v1.13.0</span>
+      <div class="spacer"></div>
+      <span class="demo">⌘K powered by hev ask</span>
+      <button class="search" data-hev-ask-open>
+        <span>Search the docs</span>
+        <kbd>⌘K</kbd>
+      </button>
+    </header>
+
+    <div class="wrap">
+      <nav class="side">
+        {nav.map(([g, items]) => {
+          if (isStandalone(g, items)) {
+            const it = items[0];
+            return (
+              <a class="solo" href={href(it.id)} aria-current={current === href(it.id).replace(/\/$/, '') ? 'page' : undefined}>{g}</a>
+            );
+          }
+          const open = items.some((it) => current === href(it.id).replace(/\/$/, '')) || g === group;
+          return (
+            <details open={open || undefined}>
+              <summary>{g}</summary>
+              <ul>
+                {items.map((it) => (
+                  <li>
+                    <a href={href(it.id)} aria-current={current === href(it.id).replace(/\/$/, '') ? 'page' : undefined}>{it.title}</a>
+                  </li>
+                ))}
+              </ul>
+            </details>
+          );
+        })}
+      </nav>
+      <main>
+        <div class="crumb">{group ? `${group} › ` : ''}{title}</div>
+        <h1>{title}</h1>
+        <article><slot /></article>
+      </main>
+    </div>
+
+    <footer>
+      <div class="fwrap">
+        <div class="note">
+          <b>Flox</b> — reproducible developer environments built on Nix, from local to CI to production.
+        </div>
+        <div class="lic">
+          Demo · search by <a href="https://hevask.com">hev ask</a> · docs from
+          <a href="https://github.com/flox/floxdocs" target="_blank" rel="noopener"> flox/floxdocs</a>
+        </div>
+      </div>
+    </footer>
+
+    <SearchOverlay />
+  </body>
+</html>

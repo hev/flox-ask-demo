@@ -1,0 +1,16 @@
+---
+id: "man/flox-activate#variables-set-by-flox-activate"
+title: "flox activate"
+heading: "Variables set by flox activate"
+group: "Manual"
+order: 334
+url: "/docs/man/flox-activate#variables-set-by-flox-activate"
+anchor: "variables-set-by-flox-activate"
+terms: ["variables","flox","activate","describes","environment","sets","during","activation","exposing","built","path","list","active","environments","cache","directory","project","description","name","json","array","whether","started","services","prompt","owner1","owner2","local","hide","default","true","start","false","floxenv","contains","merged","directories","packages","floxpromptenvironments","space"]
+hash: "4b9f62a3a3ea167b759a08fc7d120efd11572725b209f0c979ff4013a07641e3"
+mode: "agent-primary"
+facts: [{"kind":"code","literal":"$FLOX_ENV","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"bin","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"lib","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"$FLOX_PROMPT_ENVIRONMENTS","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"owner1/foo owner2/bar local_env","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"hide_default_prompt","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"true","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"default","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"$FLOX_ENV_CACHE","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"activate","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"-r","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"$FLOX_ENV_PROJECT","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"flox activate -r","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"$FLOX_ENV_DESCRIPTION","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"$_FLOX_ACTIVE_ENVIRONMENTS","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"$FLOX_ACTIVATE_START_SERVICES","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"\"true\"","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"code","literal":"\"false\"","chunkId":"man/flox-activate#variables-set-by-flox-activate"},{"kind":"value","literal":"e.g","chunkId":"man/flox-activate#variables-set-by-flox-activate"}]
+sources: [{"chunkId":"man/flox-activate#variables-set-by-flox-activate","url":"/docs/man/flox-activate#variables-set-by-flox-activate","anchor":"variables-set-by-flox-activate"}]
+---
+
+Describes the environment variables Flox sets during activation, exposing the built environment path, the list of active environments, a per-environment cache directory, the project directory, the environment's description/name, a JSON array of active environments, and whether this activation started services.

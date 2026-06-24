@@ -1,0 +1,16 @@
+---
+id: "man/flox-activate#activate-options"
+title: "flox activate"
+heading: "Activate Options"
+group: "Manual"
+order: 324
+url: "/docs/man/flox-activate#activate-options"
+anchor: "activate-options"
+terms: ["activate","options","documents","flox","including","running","command","subshell","executing","directly","trusting","remote","environments","printing","activation","script","starting","suppressing","services","choosing","mode","activating","specific","generation","arguments","trust","trusted","owner","name","deny","config","print","stdout","start","auto","true","manifest","toml","shell","string"]
+hash: "0e62dd40f72c30bbad8640e86f9bcb97f94a0246d15bfdbcbb5f44cffdb28019"
+mode: "agent-primary"
+facts: [{"kind":"code","literal":"-c \u003ccommand\u003e","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"--command \u003ccommand\u003e","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"-- \u003ccommand\u003e [\u003carguments\u003e]","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"-t","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"--trust","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"trusted_environments.\"\u003cowner/name\u003e\" = (trust | deny)","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"flox config --set trusted_environments.\\\"\u003cowner/name\u003e\\\" trust","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"--print-script","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"stdout","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"flox","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"-s","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"--start-services","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"services.auto-start = true","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"--no-start-services","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"auto-start = true","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"-m (dev|run)","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"--mode (dev|run)","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"options.activate.mode","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"manifest.toml(5)","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"-g \u003cgeneration\u003e","chunkId":"man/flox-activate#activate-options"},{"kind":"code","literal":"--generation \u003cgeneration\u003e","chunkId":"man/flox-activate#activate-options"}]
+sources: [{"chunkId":"man/flox-activate#activate-options","url":"/docs/man/flox-activate#activate-options","anchor":"activate-options"}]
+---
+
+Documents the options for flox activate, including running a command in a subshell or executing a command directly, trusting remote environments, printing the activation script, starting or suppressing services, choosing dev or run mode, and activating a specific hub generation.

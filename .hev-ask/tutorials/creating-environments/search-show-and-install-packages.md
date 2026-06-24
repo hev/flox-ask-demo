@@ -1,0 +1,16 @@
+---
+id: "tutorials/creating-environments#search-show-and-install-packages"
+title: "Creating environments"
+heading: "Search, show, and install packages"
+group: "Tutorials"
+order: 703
+url: "/docs/tutorials/creating-environments#search-show-and-install-packages"
+anchor: "search-show-and-install-packages"
+terms: ["search","show","install","packages","covers","finding","adding","commands","flox","offers","large","catalog","open","source","licensable","reveals","details","like","available","versions","supported","systems","warns","installed","package","requires","licensing","nodejs","event","driven","framework","javascript","engine","nixpkgs","latest","license","outputs","default","darwin","linux"]
+hash: "5b02ec2c29df7a192cb3cc0abec1fa1a03e6effb3381d9f2be3a28ac3e54a7fe"
+mode: "agent-primary"
+facts: [{"kind":"code","literal":"$ flox show nodejs\nnodejs - Event-driven I/O framework for the V8 JavaScript engine\nCatalog: nixpkgs\nLatest:  nodejs@24.13.0\nLicense: MIT\nOutputs: out* (* installed by default)\nSystems: x86_64-darwin, x86_64-linux, aarch64-linux, aarch64-darwin\n\nOther versions:\n    nodejs@24.13.0\n    nodejs@24.12.0\n    nodejs@22.21.1\n    nodejs@22.20.0\n    nodejs@22.19.0\n    nodejs@22.18.0\n    ...","chunkId":"tutorials/creating-environments#search-show-and-install-packages"},{"kind":"code","literal":"$ flox install nodejs\n✔ 'nodejs' installed to environment example-project at /Users/myuser/example-project","chunkId":"tutorials/creating-environments#search-show-and-install-packages"},{"kind":"code","literal":"$ flox search mkcert\nmkcert  A simple tool for making locally-trusted development certificates\n\nUse `flox show \u003cpackage\u003e` to see available versions","chunkId":"tutorials/creating-environments#search-show-and-install-packages"},{"kind":"code","literal":"$ flox install mkcert\n✔ 'mkcert' installed to environment example-project at /Users/myuser/example-project","chunkId":"tutorials/creating-environments#search-show-and-install-packages"},{"kind":"code","literal":"flox search","chunkId":"tutorials/creating-environments#search-show-and-install-packages"},{"kind":"code","literal":"flox show","chunkId":"tutorials/creating-environments#search-show-and-install-packages"},{"kind":"code","literal":"flox install","chunkId":"tutorials/creating-environments#search-show-and-install-packages"},{"kind":"code","literal":"example-project","chunkId":"tutorials/creating-environments#search-show-and-install-packages"},{"kind":"code","literal":"nodejs","chunkId":"tutorials/creating-environments#search-show-and-install-packages"},{"kind":"code","literal":"flox search \u003csearch-term\u003e --all","chunkId":"tutorials/creating-environments#search-show-and-install-packages"}]
+sources: [{"chunkId":"tutorials/creating-environments#search-show-and-install-packages","url":"/docs/tutorials/creating-environments#search-show-and-install-packages","anchor":"search-show-and-install-packages"}]
+---
+
+Covers finding and adding packages with the search, show, and install commands. Flox offers a large catalog of open-source and licensable packages; show reveals details like available versions and supported systems; and Flox warns when an installed package requires licensing.

@@ -1,0 +1,16 @@
+---
+id: "man/manifesttoml#include"
+title: "manifest.toml"
+heading: "include"
+group: "Manual"
+order: 648
+url: "/docs/man/manifesttoml#include"
+anchor: "include"
+terms: ["include","documents","section","composes","other","environments","current","ordered","list","descriptors","sets","merge","priority","later","entries","composing","manifest","local","deprecated","remote","descriptor","forms","their","directory","reference","name","fields","included","changes","pulled","only","upgrade","command","semantics","install","vars","services","overwritten","hook","profile"]
+hash: "3a6393bd77a6bec65ca7b1fbe2c427d431b8d390211d10a02f15a5c1b687d8de"
+mode: "agent-primary"
+facts: [{"kind":"code","literal":"[include]\nenvironments = [\n    { dir = \"../path/to/env\" },\n    { dir = \"../path/to/other/env\", name = \"myenv\" }\n]","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"[include]","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"include.environments","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"flox list --config","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"dir","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"--dir","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"remote","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"--reference \u003cenv-ref\u003e --upstream","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"name","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"flox include upgrade","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"[install]","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"[vars]","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"[hook]","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"hook","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"[profile]","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"profile","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"[services]","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"include","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"[containerize]","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"containerize.config","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"user","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"cmd","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"working_dir","chunkId":"man/manifesttoml#include"},{"kind":"code","literal":"stop_signal","chunkId":"man/manifesttoml#include"}]
+sources: [{"chunkId":"man/manifesttoml#include","url":"/docs/man/manifesttoml#include","anchor":"include"}]
+---
+
+Documents the include section that composes other environments into the current one: how the ordered list of include descriptors sets merge priority (later entries and the composing manifest win), the local, hub, and deprecated remote descriptor forms with their directory/reference/name fields, that included changes are pulled in only via the include-upgrade command, and the per-section merge semantics (install/vars/services overwritten, hook/profile appended, include omitted, containerize config and options deep-merged) including the implication for the default activation mode.
