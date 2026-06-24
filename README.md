@@ -61,10 +61,10 @@ git clone --filter=blob:none --no-checkout https://github.com/flox/floxdocs /tmp
 git -C /tmp/floxdocs sparse-checkout set docs mkdocs.yml
 git -C /tmp/floxdocs checkout ed5868432ebadf830228325e961b33b9bc302769
 
-# CLI manual sources
+# CLI manual sources (pinned)
 git clone --filter=blob:none --no-checkout https://github.com/flox/flox /tmp/flox-cli
 git -C /tmp/flox-cli sparse-checkout set cli/flox/doc
-git -C /tmp/flox-cli checkout HEAD
+git -C /tmp/flox-cli checkout bc43fa6f70cc6d91a46d086586fb8bc3b1d44981
 
 FLOXDOCS_SRC=/tmp/floxdocs/docs FLOX_MAN_SRC=/tmp/flox-cli/cli/flox/doc npm run ingest
 ```
@@ -77,7 +77,8 @@ committed `.hev-ask/` tree is used as-is otherwise.
 Flox documentation © Flox, Inc., sourced from
 [`flox/floxdocs`](https://github.com/flox/floxdocs) (pinned commit
 `ed58684`) and [`flox/flox`](https://github.com/flox/flox) (the `cli/flox/doc`
-CLI manual). Images load directly from GitHub at the pinned commit. The Flox
+CLI manual, pinned commit `bc43fa6`). Images load directly from GitHub at the
+pinned commit. The Flox
 name and logo are marks of Flox, Inc., used here only to identify the source
 docs in this demo. The search experience is
 [`@hevmind/ask`](https://hevask.com).
